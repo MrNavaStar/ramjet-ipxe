@@ -37,10 +37,6 @@ else
 	EMBED=""
 fi
 
-echo "Cleaning and updating git repo"
-git clean -fxq
-git pull --rebase
-
 for target in "${TARGETS[@]}"; do
 	buildopts=("CONFIG=$CONFIG")
 	if [[ -n "$EMBED" ]]; then
@@ -53,7 +49,7 @@ for target in "${TARGETS[@]}"; do
 	fi
 
 	echo "make ${buildopts[@]} $target"
-	make "${buildopts[@]}" "$target"
+	make -j$(nproc) "${buildopts[@]}" "$target"
 done
 
 echo

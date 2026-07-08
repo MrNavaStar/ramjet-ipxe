@@ -1,25 +1,25 @@
-IMAGE_BUILD = .image-build-done
-
 .PHONY: clean
 clean:
 	rm -rf out/
 
-.PHONY: purge
-purge: clean taint-image
+.PHONY: build
+build:
+	@docker compose build
+	@docker compose run --rm ipxe
 
 .PHONY: image-build
-image-build: $(IMAGE_BUILD)
+image-build:
+	@docker compose build
 
-.PHONY: build
-build: clean image-build
-	@docker-compose run --rm ipxe
+.PHONY: run
+run: build
+	@./qemu.sh
 
-# Hidden target here to ensure the image is built
-# only when the Dockerfile is actually updated
-$(IMAGE_BUILD): Dockerfile
-	@docker-compose build
-	@touch $@
+.PHONY: purge
+purge: clean
+	@docker compose down --rmi local --volumes --remove-orphans
 
-.PHONY: taint-image
-taint-image:
-	rm -f $(IMAGE_BUILD)
+.PHONY: rebuild
+rebuild:
+	@docker compose build --no-cache
+	@docker compose run --rm ipxe

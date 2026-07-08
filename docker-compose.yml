@@ -1,22 +1,12 @@
-ipxe: 
-    build: .
-    working_dir: /build/ipxe/src
-    command:
-        - /builder.sh
-        # Config name. Ensure it matches the destination volume path below
-        - template
-        # --> Add build targets here <--
-        - bin-i386-pcbios/undionly.kpxe
-        - bin-i386-efi/ipxe.efi
-        - bin-x86_64-efi/ipxe.efi
-        - bin-arm32-efi/snponly.efi
-        - bin-arm64-efi/snponly.efi
-    volumes:
-        - ./builder.sh:/builder.sh:ro
-        - ./out:/out:rw
-        # --> Mount custom named configurations here <--
-        # Mount your custom config into /build/ipxe/src/config/<config name>
-        # The config name used here should match the config name passed to the builder
-        # as the first arg.
-        - ./template:/build/ipxe/src/config/template:ro
-        - ./homelab:/build/ipxe/src/config/homelab:ro
+services:
+    ipxe:
+        build:
+            context: .
+            args:
+                IPXE_TAG: ${IPXE_TAG}
+        image: ipxe-builder:${IPXE_TAG}
+        command:
+            - bin/ipxe.lkrn
+        volumes:
+            - ./out:/out:rw
+            - ./options:/ipxe/src/config/custom:ro
