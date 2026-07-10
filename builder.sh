@@ -37,7 +37,7 @@ for target in "${TARGETS[@]}"; do
 
 	if [[ -f "config/$CONFIG/embed.ipxe" ]]; then
   	buildopts+=("EMBED=config/$CONFIG/embed.ipxe")
-  else
+  fi
 
 	if [[ "$target" =~ ^bin-arm32-efi/.*$ ]]; then
 		buildopts+=("CROSS_COMPILE=arm-linux-gnueabi-" "ARCH=arm32")
