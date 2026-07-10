@@ -5,7 +5,10 @@ set -euo pipefail
 ip=$(ip route get 1.1.1.1 | awk '{print $7; exit}')
 cat > qemu.ipxe <<EOF
 #!ipxe
-chain http://${ip}:11722/v1/idle
+:start
+chain --replace http://${ip}:11722/v1/idle ||
+sleep 5
+goto start
 EOF
 
 qemu-system-x86_64 \
