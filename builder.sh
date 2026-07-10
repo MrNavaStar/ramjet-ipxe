@@ -15,14 +15,16 @@ EOF
 	exit 1
 fi
 
+mkdir -p /out/.cache
+cp -rn /ipxe/src/* /out/.cache
+cd /out/.cache
+
 CONFIG="$1"
 shift
 if [[ ! -d "config/$CONFIG" ]]; then
-	echo "Could not find config directory /build/ipxe/src/config/$CONFIG"
+	echo "Could not find config directory /out/.cache/config/$CONFIG"
 	exit 1
 fi
-
-# TODO: More sanity checks on the config directory?
 
 TARGETS=()
 while [[ $# -gt 0 ]]; do
@@ -30,30 +32,21 @@ while [[ $# -gt 0 ]]; do
 	shift
 done
 
-# If there is an embed script with the named config, use it
-if [[ -f "config/$CONFIG/embed.ipxe" ]]; then
-	EMBED="config/$CONFIG/embed.ipxe"
-else
-	EMBED=""
-fi
-
 for target in "${TARGETS[@]}"; do
 	buildopts=("CONFIG=$CONFIG")
-	if [[ -n "$EMBED" ]]; then
-		buildopts+=("EMBED=$EMBED")
-	fi
+
+	if [[ -f "config/$CONFIG/embed.ipxe" ]]; then
+  	buildopts+=("EMBED=config/$CONFIG/embed.ipxe")
+  else
+
 	if [[ "$target" =~ ^bin-arm32-efi/.*$ ]]; then
 		buildopts+=("CROSS_COMPILE=arm-linux-gnueabi-" "ARCH=arm32")
 	elif [[ "$target" =~ ^bin-arm64-efi/.*$ ]]; then
 		buildopts+=("CROSS_COMPILE=aarch64-linux-gnu-" "ARCH=arm64")
 	fi
 
-	echo "make ${buildopts[@]} $target"
 	make -j$(nproc) "${buildopts[@]}" "$target"
 done
-
-echo
-echo "Build finished successfully!"
 
 echo
 echo "Copying build artifacts:"

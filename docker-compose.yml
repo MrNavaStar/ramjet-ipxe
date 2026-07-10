@@ -9,4 +9,4 @@ services:
             - bin/ipxe.lkrn
         volumes:
             - ./out:/out:rw
-            - ./options:/ipxe/src/config/custom:ro
+            - ./options:/out/.cache/config/custom:ro
